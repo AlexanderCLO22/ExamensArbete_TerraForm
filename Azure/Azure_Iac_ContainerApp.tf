@@ -20,15 +20,6 @@ resource "azurerm_container_app" "ContainerApp" {
   container_app_environment_id = azurerm_container_app_environment.ContainerAppEnvironment.id
   revision_mode = "Single"
 
-  ingress {
-    target_port = 5000
-    external_enabled = true
-    allow_insecure_connections = true
-    traffic_weight {
-      percentage = 100
-    }
-  }
-  
   template {
     container {
       name = "my-container"
@@ -42,4 +33,15 @@ resource "azurerm_container_app" "ContainerApp" {
     }
   }
   
+}
+
+resource "null_resource" "execute_script" {
+  triggers = {
+    conntainer_app_id = azurerm_container_app.ContainerApp.id
+  }
+
+  provisioner "local-exec" {
+    command = "apply_ingress.sh"
+    
+  }
 }
